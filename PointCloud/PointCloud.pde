@@ -9,6 +9,9 @@ import processing.dxf.*;
 import processing.pdf.*;
 
 boolean record = false;
+boolean rgb = true;
+boolean pc= true;
+boolean ir = false;
 
 // Kinect Library object
 Kinect kinect;
@@ -24,10 +27,11 @@ int h = 480;
 float[] depthLookUp = new float[2048];
 
 void setup() {
-  size(800,600,P3D);
+  size(1200,600,P3D);
   kinect = new Kinect(this);
   kinect.start();
-  kinect.enableDepth(true);
+  kinect.enableDepth(pc);
+  kinect.enableRGB(rgb);
   // We don't need the grayscale image in this example
   // so this makes it more efficient
   kinect.processDepthImage(false);
@@ -44,11 +48,14 @@ beginRaw(DXF, "raw.dxf");
 }
   //beginRaw(PDF,"raw1.pdf");
     background(0);
+    image(kinect.getVideoImage(),600,0);
    // beginRaw(DXF, "raw.dxf"); 
     fill(255);
     textMode(SCREEN);
     text("Kinect FR: " + (int)kinect.getDepthFPS() + "\nProcessing FR: " + (int)frameRate,10,16);
-  
+   text("RGB/IR FPS: " + (int) kinect.getVideoFPS(),10,495);
+  text("Press 'p' to enable/disable point cloud    Press 'r' to enable/disable rgb image  Press Space Bar to save file  Framerate: " + frameRate,10,515);
+
     // Get the raw depth as array of integers
     int[] depth = kinect.getRawDepth();
   
@@ -70,8 +77,8 @@ beginRaw(DXF, "raw.dxf");
         stroke(255);
         pushMatrix();
         // Scale up by 200
-        float factor = 200;
-        translate(v.x*factor,v.y*factor,factor-v.z*factor);
+        float factor = 300;
+        translate(v.x*factor-600,v.y*factor,factor-v.z*factor);
         // Draw a point
         point(0,0);
         popMatrix();
@@ -110,11 +117,20 @@ PVector depthToWorld(int x, int y, int depthValue) {
 }
 
 void keyPressed() {
-if (key == 'R' || key == 'r') {
-// Press R to save the file
+if (key == ' ') {
+// Press Space to save the file
 record = true;
 counter++;  //Thanks to Dr. Rhazes Spell for putting the counter in adding functionality.
 }
+  else if (key == 'r') {
+    rgb = !rgb;
+    if (rgb) ir = false;
+    kinect.enableRGB(rgb);
+  }
+    else if (key == 'p') {
+    pc = !pc;
+    kinect.enableDepth(pc);
+  }
 }
 
 void stop() {

@@ -5,6 +5,10 @@
 
 import org.openkinect.*;
 import org.openkinect.processing.*;
+import processing.dxf.*;
+import processing.pdf.*;
+
+boolean record = false;
 
 // Kinect Library object
 Kinect kinect;
@@ -33,46 +37,54 @@ void setup() {
     depthLookUp[i] = rawDepthToMeters(i);
   }
 }
-
-void draw() {
-
-  background(0);
-  fill(255);
-  textMode(SCREEN);
-  text("Kinect FR: " + (int)kinect.getDepthFPS() + "\nProcessing FR: " + (int)frameRate,10,16);
-
-  // Get the raw depth as array of integers
-  int[] depth = kinect.getRawDepth();
-
-  // We're just going to calculate and draw every 4th pixel (equivalent of 160x120)
-  int skip = 4;
-
-  // Translate and rotate
-  translate(width/2,height/2,-50);
-  rotateY(a);
-
-  for(int x=0; x<w; x+=skip) {
-    for(int y=0; y<h; y+=skip) {
-      int offset = x+y*w;
-
-      // Convert kinect data to world xyz coordinate
-      int rawDepth = depth[offset];
-      PVector v = depthToWorld(x,y,rawDepth);
-
-      stroke(255);
-      pushMatrix();
-      // Scale up by 200
-      float factor = 200;
-      translate(v.x*factor,v.y*factor,factor-v.z*factor);
-      // Draw a point
-      point(0,0);
-      popMatrix();
-    }
-  }
-
-  // Rotate
- // a += 0.015f;
+int counter = 0;
+  void draw() {
+    if (record == true) {
+beginRaw(DXF, "raw.dxf"); 
 }
+  //beginRaw(PDF,"raw1.pdf");
+    background(0);
+   // beginRaw(DXF, "raw.dxf"); 
+    fill(255);
+    textMode(SCREEN);
+    text("Kinect FR: " + (int)kinect.getDepthFPS() + "\nProcessing FR: " + (int)frameRate,10,16);
+  
+    // Get the raw depth as array of integers
+    int[] depth = kinect.getRawDepth();
+  
+    // We're just going to calculate and draw every 4th pixel (equivalent of 160x120)
+    int skip = 4;
+  
+    // Translate and rotate
+    translate(width/2,height/2,-50);
+    rotateY(a);
+  
+    for(int x=0; x<w; x+=skip) {
+      for(int y=0; y<h; y+=skip) {
+        int offset = x+y*w;
+  
+        // Convert kinect data to world xyz coordinate
+        int rawDepth = depth[offset];
+        PVector v = depthToWorld(x,y,rawDepth);
+  
+        stroke(255);
+        pushMatrix();
+        // Scale up by 200
+        float factor = 200;
+        translate(v.x*factor,v.y*factor,factor-v.z*factor);
+        // Draw a point
+        point(0,0);
+        popMatrix();
+      }
+    }
+  
+    // Rotate
+   // a += 0.015f;
+   if (record == true) {
+endRaw();
+record = false; // Stop recording to the file
+}
+  }
 
 // These functions come from: http://graphics.stanford.edu/~mdfisher/Kinect.html
 float rawDepthToMeters(int depthValue) {
@@ -95,6 +107,14 @@ PVector depthToWorld(int x, int y, int depthValue) {
   result.y = (float)((y - cy_d) * depth * fy_d);
   result.z = (float)(depth);
   return result;
+}
+
+void keyPressed() {
+if (key == 'R' || key == 'r') {
+// Press R to save the file
+record = true;
+counter++;  //Thanks to Dr. Rhazes Spell for putting the counter in adding functionality.
+}
 }
 
 void stop() {

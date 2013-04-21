@@ -27,7 +27,7 @@ int h = 480;
 float[] depthLookUp = new float[2048];
 
 void setup() {
-  size(1200,600,P3D);
+  size(1280,600,P3D);
   kinect = new Kinect(this);
   kinect.start();
   kinect.enableDepth(pc);
@@ -48,13 +48,13 @@ beginRaw(DXF, "raw.dxf");
 }
   //beginRaw(PDF,"raw1.pdf");
     background(0);
-    image(kinect.getVideoImage(),600,0);
+    image(kinect.getVideoImage(),800,20);
    // beginRaw(DXF, "raw.dxf"); 
     fill(255);
     textMode(SCREEN);
-    text("Kinect FR: " + (int)kinect.getDepthFPS() + "\nProcessing FR: " + (int)frameRate,10,16);
-   text("RGB/IR FPS: " + (int) kinect.getVideoFPS(),10,495);
-  text("Press 'p' to enable/disable point cloud    Press 'r' to enable/disable rgb image  Press Space Bar to save file  Framerate: " + frameRate,10,515);
+    text("Kinect FR: " + (int)kinect.getDepthFPS() + "\nProcessing FR: " + (int)frameRate,10,10);
+   text("RGB/IR FPS: " + (int) kinect.getVideoFPS(),10,50);
+  text("Press 'p' to enable/disable point cloud    Press 'r' to enable/disable rgb image  Press Space Bar to save file  Framerate: " + frameRate,10,80);
 
     // Get the raw depth as array of integers
     int[] depth = kinect.getRawDepth();
@@ -77,7 +77,7 @@ beginRaw(DXF, "raw.dxf");
         stroke(255);
         pushMatrix();
         // Scale up by 200
-        float factor = 300;
+        float factor = 350;
         translate(v.x*factor-600,v.y*factor,factor-v.z*factor);
         // Draw a point
         point(0,0);
